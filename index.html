@@ -1,0 +1,113 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Триколор Кемерово - Продажа и ремонт спутникового телевидения</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white py-6">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-bold">Триколор Кемерово</h1>
+            <p class="mt-2 text-lg">Продажа и ремонт спутникового телевидения</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-blue-500 py-4">
+        <div class="container mx-auto flex justify-center space-x-6">
+            <a href="#services" class="text-white hover:underline">Услуги</a>
+            <a href="#about" class="text-white hover:underline">О нас</a>
+            <a href="#contacts" class="text-white hover:underline">Контакты</a>
+        </div>
+    </nav>
+
+    <!-- Main Section -->
+    <section id="services" class="py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl font-bold text-center mb-8">Наши услуги</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="https://via.placeholder.com/300x200?text=Антенна+Триколор" alt="Антенна Триколор" class="w-full h-48 object-cover mb-4 rounded">
+                    <h3 class="text-xl font-semibold mb-4">Продажа оборудования Триколор</h3>
+                    <p>Предлагаем сертифицированные комплекты Триколор: антенны, ресиверы (GS B529L, GS U510 и др.), модули CI+. Доставка и установка в день обращения.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="https://via.placeholder.com/300x200?text=Ремонт+Антенны" alt="Ремонт антенны Триколор" class="w-full h-48 object-cover mb-4 rounded">
+                    <h3 class="text-xl font-semibold mb-4">Ремонт оборудования</h3>
+                    <p>Ремонт антенн и ресиверов Триколор на дому или в сервисном центре. Диагностика, устранение неисправностей, замена деталей. Гарантия до 2 лет.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="bg-gray-200 py-12">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold mb-4">О нас</h2>
+            <img src="https://via.placeholder.com/400x250?text=Триколор+Команда" alt="Команда Триколор" class="mx-auto mb-4 rounded">
+            <p class="text-lg max-w-2xl mx-auto">Мы — официальный дилер Триколор в Кемерово. Более 5 лет предоставляем услуги по продаже, установке и ремонту спутникового оборудования. Наши мастера работают быстро и аккуратно, обеспечивая качественный сервис для каждого клиента.</p>
+        </div>
+    </section>
+
+    <!-- Contacts Section -->
+    <section id="contacts" class="py-12">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold mb-4">Контакты</h2>
+            <p class="text-lg"><a href="https://yandex.com/maps/?text=г.+Кемерово,+ул.+Карболитовская,+1/1,+оф.+315" target="_blank" class="text-blue-600 hover:underline">📍 г. Кемерово, ул. Карболитовская, 1/1, оф. 315 (посещение офиса по предварительному звонку)</a></p>
+            <p class="text-lg">📞 Телефон: <a href="tel:+79235020110" class="text-blue-600 hover:underline">+7-923-502-0110</a></p>
+            <p class="text-lg">💬 WhatsApp: <a href="https://wa.me/79235020110" class="text-green-600 hover:underline" target="_blank">Написать в WhatsApp</a></p>
+            <p class="text-lg">⏰ Время работы: 08:00 - 22:00, ежедневно</p>
+            <p class="text-lg mt-4">Звоните или оставляйте заявку на установку и ремонт!</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-blue-600 text-white py-4">
+        <div class="container mx-auto text-center">
+            <p>© 2025 Триколор Кемерово. Все права защищены.</p>
+        </div>
+    </footer>
+</body>
+</html>
