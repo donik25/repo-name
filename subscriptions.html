@@ -37,6 +37,45 @@
         }
         return gk_fileData[filename] || "";
         }
+        </script><script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
         </script><!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -93,7 +132,6 @@
     <nav class="bg-blue-500 py-4 sticky top-0 z-10">
         <div class="container mx-auto flex justify-center space-x-6 relative">
             <a href="index.html#services" class="text-white hover:underline smooth-scroll">Услуги</a>
-            <a href="index.html#about" class="text-white hover:underline smooth-scroll">О нас</a>
             <div class="relative dropdown">
                 <a href="#" class="text-white hover:underline dropdown-toggle">Подписки</a>
                 <div class="dropdown-menu absolute left-0 w-64 bg-blue-600 text-white rounded-lg shadow-lg">
@@ -128,6 +166,7 @@
                     </div>
                 </div>
             </div>
+            <a href="index.html#about" class="text-white hover:underline smooth-scroll">О нас</a>
             <a href="index.html#contacts" class="text-white hover:underline smooth-scroll">Контакты</a>
         </div>
     </nav>
@@ -139,54 +178,54 @@
             <h3 class="text-xl font-bold text-blue-600 text-center mb-6">Основные пакеты</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                 <div id="premium" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/prem.png?text=Премиум" alt="Премиум" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/prem.png?text=Премиум" alt="Премиум" class="w-full object-cover rounded">
                 </div>
                 <div id="maximum" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/max.png?text=Максимум" alt="Максимум" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/max.png?text=Максимум" alt="Максимум" class="w-full object-cover rounded">
                 </div>
                 <div id="unified-ultra" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/eu.png?text=Единый+Ultra" alt="Единый Ultra" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/eu.png?text=Единый+Ultra" alt="Единый Ultra" class="w-full object-cover rounded">
                 </div>
                 <div id="super-ultra-child" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/sud.png?text=Супер+Ultra+Детский" alt="Супер Ultra Детский" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/sud.png?text=Супер+Ultra+Детский" alt="Супер Ultra Детский" class="w-full object-cover rounded">
                 </div>
                 <div id="super-ultra-adult" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/suv.png?text=Супер+Ultra+Взрослый" alt="Супер Ultra Взрослый" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/suv.png?text=Супер+Ultra+Взрослый" alt="Супер Ultra Взрослый" class="w-full object-cover rounded">
                 </div>
                 <div id="start" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/start.png?text=Старт" alt="Старт" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/start.png?text=Старт" alt="Старт" class="w-full object-cover rounded">
                 </div>
             </div>
 
             <h3 class="text-xl font-bold text-blue-600 text-center mb-6">Дополнительные пакеты</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                 <div id="child" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/det.png?text=Детский" alt="Детский" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/det.png?text=Детский" alt="Детский" class="w-full object-cover rounded">
                 </div>
                 <div id="adult" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/vzros.png?text=Взрослый" alt="Взрослый" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/vzros.png?text=Взрослый" alt="Взрослый" class="w-full object-cover rounded">
                 </div>
                 <div id="ultra" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/ultra.png?text=Ultra" alt="Ultra" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/ultra.png?text=Ultra" alt="Ultra" class="w-full object-cover rounded">
                 </div>
             </div>
 
             <h3 class="text-xl font-bold text-blue-600 text-center mb-6">Онлайн пакеты</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div id="unified-ultra-online" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/euo.png?text=Единый+Ultra+онлайн" alt="Единый Ultra онлайн" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/euo.png?text=Единый+Ultra+онлайн" alt="Единый Ultra онлайн" class="w-full object-cover rounded">
                 </div>
                 <div id="unified-online" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/eo.png?text=Единый+онлайн" alt="Единый онлайн" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/eo.png?text=Единый+онлайн" alt="Единый онлайн" class="w-full object-cover rounded">
                 </div>
                 <div id="color" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/color.png?text=Color" alt="Color" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/color.png?text=Color" alt="Color" class="w-full object-cover rounded">
                 </div>
                 <div id="color-plus" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/colorp.png?text=Color+" alt="Color+" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/colorp.png?text=Color+" alt="Color+" class="w-full object-cover rounded">
                 </div>
                 <div id="color-plus-start" class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="picture/colors.png?text=Color+start" alt="Color+start" class="w-full h-[390px] object-cover rounded">
+                    <img src="picture/colors.png?text=Color+start" alt="Color+start" class="w-full object-cover rounded">
                 </div>
             </div>
         </div>
@@ -256,5 +295,5 @@
             }
         });
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93bbffee38349ae2',t:'MTc0NjU3MTQ0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
