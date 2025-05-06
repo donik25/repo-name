@@ -45,7 +45,6 @@
     <title>Триколор Кемерово - Продажа и ремонт спутникового телевидения</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for enhanced visuals */
         .fade-in {
             opacity: 0;
             transform: translateY(20px);
@@ -68,7 +67,6 @@
         header.shrunk {
             padding: 1rem 0;
         }
-        /* Modal styles */
         #mapModal {
             transition: opacity 0.3s ease;
         }
@@ -80,10 +78,30 @@
             opacity: 1;
             pointer-events: auto;
         }
+        .dropdown-menu {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(-10px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .dropdown:hover .dropdown-menu, .dropdown-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* Ensure no gap between toggle and menu */
+        .dropdown-menu {
+            top: 100%;
+            margin-top: -2px; /* Slight overlap to prevent hover loss */
+            z-index: 20;
+        }
+        .dropdown-toggle {
+            position: relative;
+            padding-bottom: 2px; /* Extend hover area slightly */
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
-    <!-- Existing Script for File Handling -->
     <script type="text/javascript">
         var gk_isXlsx = false;
         var gk_xlsxFileLookup = {};
@@ -97,22 +115,14 @@
                 var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
                 var firstSheetName = workbook.SheetNames[0];
                 var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
                 var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
                 var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
                 var headerRowIndex = filteredData.findIndex((row, index) =>
                   row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
                 );
-                // Fallback
                 if (headerRowIndex === -1 || headerRowIndex > 25) {
                   headerRowIndex = 0;
                 }
-
-                // Convert filtered JSON back to CSV
                 var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
                 csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
                 return csv;
@@ -125,7 +135,6 @@
         }
     </script>
 
-    <!-- Header -->
     <header class="bg-blue-600 text-white py-6">
         <div class="container mx-auto text-center">
             <h1 class="text-3xl font-bold">Триколор Кемерово</h1>
@@ -133,16 +142,48 @@
         </div>
     </header>
 
-    <!-- Navigation -->
     <nav class="bg-blue-500 py-4 sticky top-0 z-10">
-        <div class="container mx-auto flex justify-center space-x-6">
+        <div class="container mx-auto flex justify-center space-x-6 relative">
             <a href="#services" class="text-white hover:underline smooth-scroll">Услуги</a>
             <a href="#about" class="text-white hover:underline smooth-scroll">О нас</a>
+            <div class="relative dropdown">
+                <a href="#" class="text-white hover:underline dropdown-toggle">Подписки</a>
+                <div class="dropdown-menu absolute left-0 w-64 bg-blue-600 text-white rounded-lg shadow-lg">
+                    <div class="px-4 py-2">
+                        <h4 class="text-sm font-semibold">Основные пакеты</h4>
+                        <ul class="mt-1 text-sm">
+                            <li><a href="subscriptions.html#premium" class="hover:underline">Премиум</a></li>
+                            <li><a href="subscriptions.html#maximum" class="hover:underline">Максимум</a></li>
+                            <li><a href="subscriptions.html#unified-ultra" class="hover:underline">Единый Ultra</a></li>
+                            <li><a href="subscriptions.html#super-ultra-child" class="hover:underline">Супер Ultra Детский</a></li>
+                            <li><a href="subscriptions.html#super-ultra-adult" class="hover:underline">Супер Ultra Взрослый</a></li>
+                            <li><a href="subscriptions.html#start" class="hover:underline">Старт</a></li>
+                        </ul>
+                    </div>
+                    <div class="px-4 py-2">
+                        <h4 class="text-sm font-semibold">Дополнительные пакеты</h4>
+                        <ul class="mt-1 text-sm">
+                            <li><a href="subscriptions.html#child" class="hover:underline">Детский</a></li>
+                            <li><a href="subscriptions.html#adult" class="hover:underline">Взрослый</a></li>
+                            <li><a href="subscriptions.html#ultra" class="hover:underline">Ultra</a></li>
+                        </ul>
+                    </div>
+                    <div class="px-4 py-2">
+                        <h4 class="text-sm font-semibold">Онлайн пакеты</h4>
+                        <ul class="mt-1 text-sm">
+                            <li><a href="subscriptions.html#unified-ultra-online" class="hover:underline">Единый Ultra онлайн</a></li>
+                            <li><a href="subscriptions.html#unified-online" class="hover:underline">Единый онлайн</a></li>
+                            <li><a href="subscriptions.html#color" class="hover:underline">Color</a></li>
+                            <li><a href="subscriptions.html#color-plus" class="hover:underline">Color+</a></li>
+                            <li><a href="subscriptions.html#color-plus-start" class="hover:underline">Color+start</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <a href="#contacts" class="text-white hover:underline smooth-scroll">Контакты</a>
         </div>
     </nav>
 
-    <!-- Main Section -->
     <section id="services" class="py-12 fade-in">
         <div class="container mx-auto px-4">
             <h2 class="text-2xl font-bold text-center mb-8">Наши услуги</h2>
@@ -170,7 +211,6 @@
         </div>
     </section>
 
-    <!-- About Section -->
     <section id="about" class="bg-gray-200 py-12 fade-in">
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-2xl font-bold mb-4">О нас</h2>
@@ -179,7 +219,6 @@
         </div>
     </section>
 
-    <!-- Contacts Section -->
     <section id="contacts" class="py-12 fade-in">
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-2xl font-bold mb-4">Контакты</h2>
@@ -191,7 +230,6 @@
             <p class="text-lg">⏰ Время работы: 08:00 - 22:00, ежедневно</p>
             <p class="text-lg mt-4">Звоните или оставляйте заявку на установку и ремонт!</p>
 
-            <!-- Modal for Map Selection -->
             <div id="mapModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
                     <h3 class="text-lg font-semibold mb-4">Открыть адрес в:</h3>
@@ -204,16 +242,13 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="bg-blue-600 text-white py-4">
         <div class="container mx-auto text-center">
             <p>© 2025 Триколор Кемерово. Все права защищены.</p>
         </div>
     </footer>
 
-    <!-- JavaScript Enhancements -->
     <script>
-        // Smooth Scroll for Navigation
         document.querySelectorAll('.smooth-scroll').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -223,7 +258,6 @@
             });
         });
 
-        // Fade-In Animation on Scroll
         const fadeInElements = document.querySelectorAll('.fade-in');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -236,7 +270,6 @@
 
         fadeInElements.forEach(element => observer.observe(element));
 
-        // Shrink Header on Scroll
         const header = document.querySelector('header');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
@@ -246,7 +279,6 @@
             }
         });
 
-        // Map Selection Modal Logic
         const mapModal = document.getElementById('mapModal');
         const closeModalBtn = document.getElementById('closeModal');
         const mapLinks = document.querySelectorAll('.map-link');
@@ -264,18 +296,31 @@
         mapOptions.forEach(option => {
             option.addEventListener('click', () => {
                 const service = option.getAttribute('data-service');
-                let url = '';
+                let appUrl = '';
+                let webUrl = '';
                 const encodedAddress = encodeURIComponent(currentAddress);
 
                 if (service === 'yandex') {
-                    url = `https://yandex.com/maps/?text=${encodedAddress}`;
+                    appUrl = `yandexmaps://maps.yandex.com/?text=${encodedAddress}`;
+                    webUrl = `https://yandex.com/maps/?text=${encodedAddress}`;
                 } else if (service === 'google') {
-                    url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+                    appUrl = `comgooglemaps://?q=${encodedAddress}`;
+                    webUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
                 } else if (service === '2gis') {
-                    url = `https://2gis.ru/search/${encodedAddress}`;
+                    appUrl = `dgis://2gis.ru/search/${encodedAddress}`;
+                    webUrl = `https://2gis.ru/search/${encodedAddress}`;
                 }
 
-                window.open(url, '_blank');
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = appUrl;
+                document.body.appendChild(iframe);
+
+                setTimeout(() => {
+                    window.location.href = webUrl;
+                    document.body.removeChild(iframe);
+                }, 1000);
+
                 mapModal.classList.add('hidden');
             });
         });
@@ -284,15 +329,33 @@
             mapModal.classList.add('hidden');
         });
 
-        // Close modal when clicking outside
         mapModal.addEventListener('click', (e) => {
             if (e.target === mapModal) {
                 mapModal.classList.add('hidden');
             }
         });
+
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+
+        // Toggle dropdown on click for mobile only
+        dropdownToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!window.matchMedia('(hover: hover)').matches) {
+                dropdownMenu.classList.toggle('active');
+            }
+        });
+
+        // Close dropdown on click outside for mobile only
+        document.addEventListener('click', (e) => {
+            if (!window.matchMedia('(hover: hover)').matches &&
+                !dropdownToggle.contains(e.target) &&
+                !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('active');
+            }
+        });
     </script>
 
-    <!-- Existing Footer Script -->
     <script>
         (function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93bb490c5a7c2884',t:'MTc0NjU2Mzk0OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
     </script>

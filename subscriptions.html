@@ -1,0 +1,260 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подписки Триколор Кемерово</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        header {
+            transition: padding 0.3s ease;
+        }
+        header.shrunk {
+            padding: 1rem 0;
+        }
+        .dropdown-menu {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(-10px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .dropdown:hover .dropdown-menu, .dropdown-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .dropdown-menu {
+            top: 100%;
+            margin-top: -2px;
+            z-index: 20;
+        }
+        .dropdown-toggle {
+            position: relative;
+            padding-bottom: 2px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white py-6">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-bold">Триколор Кемерово</h1>
+            <p class="mt-2 text-lg">Подписки на спутниковое телевидение</p>
+        </div>
+    </header>
+
+    <nav class="bg-blue-500 py-4 sticky top-0 z-10">
+        <div class="container mx-auto flex justify-center space-x-6 relative">
+            <a href="index.html#services" class="text-white hover:underline smooth-scroll">Услуги</a>
+            <a href="index.html#about" class="text-white hover:underline smooth-scroll">О нас</a>
+            <div class="relative dropdown">
+                <a href="#" class="text-white hover:underline dropdown-toggle">Подписки</a>
+                <div class="dropdown-menu absolute left-0 w-64 bg-blue-600 text-white rounded-lg shadow-lg">
+                    <div class="px-4 py-2">
+                        <h4 class="text-sm font-semibold">Основные пакеты</h4>
+                        <ul class="mt-1 text-sm">
+                            <li><a href="#premium" class="hover:underline smooth-scroll">Премиум</a></li>
+                            <li><a href="#maximum" class="hover:underline smooth-scroll">Максимум</a></li>
+                            <li><a href="#unified-ultra" class="hover:underline smooth-scroll">Единый Ultra</a></li>
+                            <li><a href="#super-ultra-child" class="hover:underline smooth-scroll">Супер Ultra Детский</a></li>
+                            <li><a href="#super-ultra-adult" class="hover:underline smooth-scroll">Супер Ultra Взрослый</a></li>
+                            <li><a href="#start" class="hover:underline smooth-scroll">Старт</a></li>
+                        </ul>
+                    </div>
+                    <div class="px-4 py-2">
+                        <h4 class="text-sm font-semibold">Дополнительные пакеты</h4>
+                        <ul class="mt-1 text-sm">
+                            <li><a href="#child" class="hover:underline smooth-scroll">Детский</a></li>
+                            <li><a href="#adult" class="hover:underline smooth-scroll">Взрослый</a></li>
+                            <li><a href="#ultra" class="hover:underline smooth-scroll">Ultra</a></li>
+                        </ul>
+                    </div>
+                    <div class="px-4 py-2">
+                        <h4 class="text-sm font-semibold">Онлайн пакеты</h4>
+                        <ul class="mt-1 text-sm">
+                            <li><a href="#unified-ultra-online" class="hover:underline smooth-scroll">Единый Ultra онлайн</a></li>
+                            <li><a href="#unified-online" class="hover:underline smooth-scroll">Единый онлайн</a></li>
+                            <li><a href="#color" class="hover:underline smooth-scroll">Color</a></li>
+                            <li><a href="#color-plus" class="hover:underline smooth-scroll">Color+</a></li>
+                            <li><a href="#color-plus-start" class="hover:underline smooth-scroll">Color+start</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <a href="index.html#contacts" class="text-white hover:underline smooth-scroll">Контакты</a>
+        </div>
+    </nav>
+
+    <section class="py-12 fade-in">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl font-bold text-center mb-8">Наши подписки</h2>
+            
+            <h3 class="text-xl font-bold text-blue-600 text-center mb-6">Основные пакеты</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                <div id="premium" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/prem.png?text=Премиум" alt="Премиум" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="maximum" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/max.png?text=Максимум" alt="Максимум" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="unified-ultra" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/eu.png?text=Единый+Ultra" alt="Единый Ultra" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="super-ultra-child" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/sud.png?text=Супер+Ultra+Детский" alt="Супер Ultra Детский" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="super-ultra-adult" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/suv.png?text=Супер+Ultra+Взрослый" alt="Супер Ultra Взрослый" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="start" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/start.png?text=Старт" alt="Старт" class="w-full h-[390px] object-cover rounded">
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-blue-600 text-center mb-6">Дополнительные пакеты</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                <div id="child" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/det.png?text=Детский" alt="Детский" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="adult" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/vzros.png?text=Взрослый" alt="Взрослый" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="ultra" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/ultra.png?text=Ultra" alt="Ultra" class="w-full h-[390px] object-cover rounded">
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-blue-600 text-center mb-6">Онлайн пакеты</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div id="unified-ultra-online" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/euo.png?text=Единый+Ultra+онлайн" alt="Единый Ultra онлайн" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="unified-online" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/eo.png?text=Единый+онлайн" alt="Единый онлайн" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="color" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/color.png?text=Color" alt="Color" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="color-plus" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/colorp.png?text=Color+" alt="Color+" class="w-full h-[390px] object-cover rounded">
+                </div>
+                <div id="color-plus-start" class="bg-white p-6 rounded-lg shadow-md">
+                    <img src="picture/colors.png?text=Color+start" alt="Color+start" class="w-full h-[390px] object-cover rounded">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-blue-600 text-white py-4">
+        <div class="container mx-auto text-center">
+            <p>© 2025 Триколор Кемерово. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.smooth-scroll').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                if (href.includes('#')) {
+                    const [page, targetId] = href.split('#');
+                    if (!page || page === 'subscriptions.html') {
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    } else {
+                        window.location.href = href;
+                    }
+                }
+            });
+        });
+
+        const fadeInElements = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        fadeInElements.forEach(element => observer.observe(element));
+
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('shrunk');
+            } else {
+                header.classList.remove('shrunk');
+            }
+        });
+
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+
+        dropdownToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!window.matchMedia('(hover: hover)').matches) {
+                dropdownMenu.classList.toggle('active');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!window.matchMedia('(hover: hover)').matches &&
+                !dropdownToggle.contains(e.target) &&
+                !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
