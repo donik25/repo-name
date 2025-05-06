@@ -44,8 +44,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Триколор Кемерово - Продажа и ремонт спутникового телевидения</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for enhanced visuals */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .service-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .service-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        header {
+            transition: padding 0.3s ease;
+        }
+        header.shrunk {
+            padding: 1rem 0;
+        }
+        /* Modal styles */
+        #mapModal {
+            transition: opacity 0.3s ease;
+        }
+        #mapModal.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #mapModal:not(.hidden) {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 font-sans">
+    <!-- Existing Script for File Handling -->
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+    </script>
+
     <!-- Header -->
     <header class="bg-blue-600 text-white py-6">
         <div class="container mx-auto text-center">
@@ -55,25 +134,34 @@
     </header>
 
     <!-- Navigation -->
-    <nav class="bg-blue-500 py-4">
+    <nav class="bg-blue-500 py-4 sticky top-0 z-10">
         <div class="container mx-auto flex justify-center space-x-6">
-            <a href="#services" class="text-white hover:underline">Услуги</a>
-            <a href="#about" class="text-white hover:underline">О нас</a>
-            <a href="#contacts" class="text-white hover:underline">Контакты</a>
+            <a href="#services" class="text-white hover:underline smooth-scroll">Услуги</a>
+            <a href="#about" class="text-white hover:underline smooth-scroll">О нас</a>
+            <a href="#contacts" class="text-white hover:underline smooth-scroll">Контакты</a>
         </div>
     </nav>
 
     <!-- Main Section -->
-    <section id="services" class="py-12">
+    <section id="services" class="py-12 fade-in">
         <div class="container mx-auto px-4">
             <h2 class="text-2xl font-bold text-center mb-8">Наши услуги</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="bg-white p-6 rounded-lg shadow-md service-card">
                     <img src="https://via.placeholder.com/300x200?text=Антенна+Триколор" alt="Антенна Триколор" class="w-full h-48 object-cover mb-4 rounded">
                     <h3 class="text-xl font-semibold mb-4">Продажа оборудования Триколор</h3>
-                    <p>Предлагаем сертифицированные комплекты Триколор: антенны, ресиверы (GS B529L, GS U510 и др.), модули CI+. Доставка и установка в день обращения.</p>
+                    <p>Предлагаем сертифицированные комплекты Триколор:<br>
+                    - антенны и ресиверы: самые современные модели:<br>
+                      -медиахаб премиум-класса GS HUB 1 Pro "Селигер"<br>
+                      -медиахаб МИНИ GS Hub 2 Box - младшую модель<br>
+                    - новые модели предыдущих поколений:<br>
+                      -1: GS В626/627/623/529/523<br>
+                      -2: GS В622/621/528/527/5210<br>
+                      -3: GS В531m/531n/520<br>
+                    - модули CI+<br>
+                    - Доставка и установка в день обращения</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="bg-white p-6 rounded-lg shadow-md service-card">
                     <img src="https://via.placeholder.com/300x200?text=Ремонт+Антенны" alt="Ремонт антенны Триколор" class="w-full h-48 object-cover mb-4 rounded">
                     <h3 class="text-xl font-semibold mb-4">Ремонт оборудования</h3>
                     <p>Ремонт антенн и ресиверов Триколор на дому или в сервисном центре. Диагностика, устранение неисправностей, замена деталей. Гарантия до 2 лет.</p>
@@ -83,23 +171,36 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="bg-gray-200 py-12">
+    <section id="about" class="bg-gray-200 py-12 fade-in">
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-2xl font-bold mb-4">О нас</h2>
             <img src="https://via.placeholder.com/400x250?text=Триколор+Команда" alt="Команда Триколор" class="mx-auto mb-4 rounded">
-            <p class="text-lg max-w-2xl mx-auto">Мы — официальный дилер Триколор в Кемерово. Более 5 лет предоставляем услуги по продаже, установке и ремонту спутникового оборудования. Наши мастера работают быстро и аккуратно, обеспечивая качественный сервис для каждого клиента.</p>
+            <p class="text-lg max-w-2xl mx-auto">Мы — официальный дилер Триколор в Кемерово с марта 2008 года, начала вещания на Сибирь со спутника «Бонум-1. С 2003 года уже более 22 лет предоставляем услуги по продаже, установке и ремонту спутникового оборудования. Наши мастера работают быстро и аккуратно, обеспечивая качественный сервис для каждого клиента.</p>
         </div>
     </section>
 
     <!-- Contacts Section -->
-    <section id="contacts" class="py-12">
+    <section id="contacts" class="py-12 fade-in">
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-2xl font-bold mb-4">Контакты</h2>
-            <p class="text-lg"><a href="https://yandex.com/maps/?text=г.+Кемерово,+ул.+Карболитовская,+1/1,+оф.+315" target="_blank" class="text-blue-600 hover:underline">📍 г. Кемерово, ул. Карболитовская, 1/1, оф. 315 (посещение офиса по предварительному звонку)</a></p>
+            <p class="text-lg"><a href="#" class="text-blue-600 hover:underline map-link" data-address="г. Кемерово, ул. Карболитовская, 1/1, оф. 315">📍 г. Кемерово, ул. Карболитовская, 1/1, оф. 315 (посещение офиса по предварительному звонку)</a></p>
+            <p class="text-lg"><a href="#" class="text-blue-600 hover:underline map-link" data-address="г. Кемерово, ул. Греческая деревня, 147а">📍 г. Кемерово, ул. Греческая деревня, 147а (посещение офиса по предварительному звонку)</a></p>
+            <p class="text-lg"><a href="#" class="text-blue-600 hover:underline map-link" data-address="г. Кемерово, ул. Абызова, 12а/2">📍 г. Кемерово, ул. Абызова, 12а/2 (посещение офиса по предварительному звонку)</a></p>
             <p class="text-lg">📞 Телефон: <a href="tel:+79235020110" class="text-blue-600 hover:underline">+7-923-502-0110</a></p>
             <p class="text-lg">💬 WhatsApp: <a href="https://wa.me/79235020110" class="text-green-600 hover:underline" target="_blank">Написать в WhatsApp</a></p>
             <p class="text-lg">⏰ Время работы: 08:00 - 22:00, ежедневно</p>
             <p class="text-lg mt-4">Звоните или оставляйте заявку на установку и ремонт!</p>
+
+            <!-- Modal for Map Selection -->
+            <div id="mapModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+                    <h3 class="text-lg font-semibold mb-4">Открыть адрес в:</h3>
+                    <button class="w-full bg-blue-600 text-white py-2 mb-2 rounded hover:bg-blue-700 map-option" data-service="yandex">Яндекс Карты</button>
+                    <button class="w-full bg-blue-600 text-white py-2 mb-2 rounded hover:bg-blue-700 map-option" data-service="google">Google Maps</button>
+                    <button class="w-full bg-blue-600 text-white py-2 mb-2 rounded hover:bg-blue-700 map-option" data-service="2gis">2GIS</button>
+                    <button id="closeModal" class="w-full bg-gray-300 text-black py-2 rounded hover:bg-gray-400">Отмена</button>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -109,5 +210,91 @@
             <p>© 2025 Триколор Кемерово. Все права защищены.</p>
         </div>
     </footer>
+
+    <!-- JavaScript Enhancements -->
+    <script>
+        // Smooth Scroll for Navigation
+        document.querySelectorAll('.smooth-scroll').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Fade-In Animation on Scroll
+        const fadeInElements = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        fadeInElements.forEach(element => observer.observe(element));
+
+        // Shrink Header on Scroll
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('shrunk');
+            } else {
+                header.classList.remove('shrunk');
+            }
+        });
+
+        // Map Selection Modal Logic
+        const mapModal = document.getElementById('mapModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const mapLinks = document.querySelectorAll('.map-link');
+        const mapOptions = document.querySelectorAll('.map-option');
+        let currentAddress = '';
+
+        mapLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentAddress = link.getAttribute('data-address');
+                mapModal.classList.remove('hidden');
+            });
+        });
+
+        mapOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const service = option.getAttribute('data-service');
+                let url = '';
+                const encodedAddress = encodeURIComponent(currentAddress);
+
+                if (service === 'yandex') {
+                    url = `https://yandex.com/maps/?text=${encodedAddress}`;
+                } else if (service === 'google') {
+                    url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+                } else if (service === '2gis') {
+                    url = `https://2gis.ru/search/${encodedAddress}`;
+                }
+
+                window.open(url, '_blank');
+                mapModal.classList.add('hidden');
+            });
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            mapModal.classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        mapModal.addEventListener('click', (e) => {
+            if (e.target === mapModal) {
+                mapModal.classList.add('hidden');
+            }
+        });
+    </script>
+
+    <!-- Existing Footer Script -->
+    <script>
+        (function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93bb490c5a7c2884',t:'MTc0NjU2Mzk0OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
+    </script>
 </body>
 </html>
